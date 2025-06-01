@@ -1,0 +1,26 @@
+name: Control Push # Créez control_tests.yaml et attribuez un nom à notre flux de travail, définissez l'action sur "push"
+on: push
+jobs: # Définissez un id de tâche, nommez-le et définissons sur quelle instance nous voulons l'exécuter.
+  qa:
+    name: Check tests
+    runs-on: ubuntu-20.04
+    steps: #Maintenant, configurons nos étapes. Nous avons 5 étapes : Un contrôle du dépôt ; Configuration de Python sur la VM ; L'installation des paquets ; L'exécution de nos tests; Le contrôle de la convention Pep8
+      - name: Checkout on master # Dans la première étape, nous avons le mot clé uses qui fait appel à un workflow réutilisable déjà existant sur github. Ensuite nous installons Python sur l'instance avec un autre worflow qui existe déjà. et nous spécifions la version de Python avec le mot clé with.
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@master
+        with:
+          python-version: "3.x"
+
+      - name: Install pytest and flake8 # Dans les étapes suivantes, nous allons installer deux paquets et exécuter pytest et flake8
+        run: |
+          pip install pytest
+          pip install flake8
+
+      - name: Run tests # Avec le mot clé run, il suffit de lancer cette commande dans le shell Ubuntu sur l'instance. Pour utiliser flake8, vous devez utiliser un workflow déjà existant sur le marketplace github.
+        run: |
+          pytest
+
+      - name: Run flake8
+        uses: py-actions/flake8@v2
